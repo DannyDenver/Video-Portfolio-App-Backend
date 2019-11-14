@@ -7,8 +7,8 @@ class Videographer(db.Model):
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
     location = db.Column(db.String(30))
-    bio = db.Column(db.String(2000))
-    profile_url = db.Column(db.String(250))
+    bio = db.Column(db.String())
+    profile_url = db.Column(db.String())
     videos = db.relationship("Video", backref=db.backref("videographer"), lazy="dynamic")
 
     def __init__(self, first_name, last_name, location, bio, profile_url):
@@ -36,9 +36,9 @@ class Video(db.Model):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     videographer_id = db.Column(db.Integer, db.ForeignKey('videographer.id'), nullable=False)
-    url = db.Column(db.String(250))
-    title = db.Column(db.String(120))
-    description = db.Column(db.String(2000))
+    url = db.Column(db.String())
+    title = db.Column(db.String(200))
+    description = db.Column(db.String())
 
     def __init__(self, videographer_id, url, title, description):
         self.videographer_id = videographer_id

@@ -3,6 +3,7 @@ import sys
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy 
 from flask_cors import CORS
+from sqlalchemy import func
 
 app = Flask(__name__)
 
@@ -38,6 +39,16 @@ def setup_videographer():
 def get_videographers():
     videogoos = Videographer.query.all()
     return jsonify([videogoo.serialize() for videogoo in videogoos])
+
+@app.route('/videographers/<string:name>', methods=['GET'])
+def get_videographer(name):
+    print(name)
+    names = name.split('-')
+    videogoo = Videographer.query.filter(func.lower(Videographer.first_name).match(names[0])).filter(func.lower(Videographer.last_name).match(names[1])).first()
+    
+    return jsonify(videogoo.serialize())
+
+
    
 
 
