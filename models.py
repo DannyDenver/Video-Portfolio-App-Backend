@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy.ext.hybrid import hybrid_property
 
 class Videographer(db.Model): 
     __tablename__ = 'videographer'
@@ -11,6 +12,10 @@ class Videographer(db.Model):
     profile_url = db.Column(db.String())
     videos = db.relationship("Video", backref=db.backref("videographer"), lazy="dynamic")
 
+    @hybrid_property
+    def current_videos(self):
+        return self.videos.all()
+
     def __init__(self, first_name, last_name, location, bio, profile_url):
         self.first_name = first_name
         self.last_name = last_name
@@ -21,6 +26,15 @@ class Videographer(db.Model):
     def __repr__(self):
         return '<Videographer id: {0}, name: {1} {2}, location: {3} >'.format(self.id, self.first_name, self.last_name, self.location)
 
+    def short(self):
+        return {
+            'id': self.id,
+            'firstName': self.first_name,
+            'lastName': self.last_name,
+            'location': self.location,
+            'profilePictureUrl': self.profile_url
+        }
+
     def serialize(self):
         return {
             'id': self.id,
@@ -28,7 +42,8 @@ class Videographer(db.Model):
             'lastName': self.last_name,
             'location': self.location,
             'bio': self.bio,
-            'profilePictureUrl': self.profile_url,            
+            'profilePictureUrl': self.profile_url,
+            'videos': [vd.serialize() for vd in self.current_videos]            
         }
 
 class Video(db.Model):

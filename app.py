@@ -70,14 +70,14 @@ def patch_videographer(jwt):
 @app.route('/videographers', methods=['GET'])
 def get_videographers():
     videogoos = Videographer.query.all()
-    return jsonify([videogoo.serialize() for videogoo in videogoos])
+    return jsonify([videogoo.short() for videogoo in videogoos])
 
 @app.route('/videographers/<string:name>', methods=['GET'])
 def get_videographer(name):
     print(name)
     names = name.split('-')
     videogoo = Videographer.query.filter(func.lower(Videographer.first_name).match(names[0])).filter(func.lower(Videographer.last_name).match(names[1])).first()
-    
+    print(videogoo.current_videos)
     return jsonify(videogoo.serialize())
 
 
@@ -101,6 +101,46 @@ def delete_videographer(jwt, id):
         'delete': videogoo.first_name
     })
 
+@app.route('/videos', methods=['POST'])
+@requires_auth('post:video')
+def add_video(jwt):
+    videoForm = request.get_json()
+    print(videoForm)
+    video = Video(videographer_id=videoForm['videographerId'], title=videoForm['title'], description=videoForm['description'], url=videoForm['url'], )
+    videoCopy = video.serialize()
+
+    try:
+        db.session.add(video)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        error = True
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+
+    return jsonify({
+        "video": videoCopy
+    })
+
+@app.route('/videos/<int:id>', methods=['DELETE'])
+@requires_auth('delete:video')
+def delete_video(jwt, id):
+    video = Video.query.get(id)
+    print(video)
+
+    try:
+        db.session.delete(video)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        abort(422)
+    finally:
+        db.session.close()
+
+    return jsonify({
+        'success': True,
+    })
 
 
 @app.errorhandler(422)
