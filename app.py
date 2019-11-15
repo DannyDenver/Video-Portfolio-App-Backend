@@ -36,6 +36,37 @@ def setup_videographer(jwt):
         "videographer": [videogooCopy]
     })
 
+
+@app.route('/videographers', methods=['PATCH'])
+@requires_auth('patch:videographer')
+def patch_videographer(jwt):
+    videogooForm = request.get_json()
+    print(videogooForm)
+
+    videogoo = Videographer.query.get(videogooForm['id'])
+
+    videogoo.first_name = videogooForm['firstName']
+    videogoo.last_name = videogooForm['lastName']
+    videogoo.location = videogooForm['location']
+    videogoo.bio = videogooForm['bio']
+    videogoo.profile_url = videogooForm['profilePictureUrl']
+    videogooCopy = videogoo.serialize()
+
+    try:
+        db.session.commit()
+    except Exception: 
+        db.session.rollback()
+        abort(422)
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+
+
+    return jsonify({
+        "videographer": [videogooCopy]
+    })
+
+
 @app.route('/videographers', methods=['GET'])
 def get_videographers():
     videogoos = Videographer.query.all()
