@@ -1,1 +1,1 @@
-web: gunicorn portfolio-app:create_app()
+web: gunicorn manage:app
