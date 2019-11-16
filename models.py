@@ -1,6 +1,8 @@
-from app import db
+# from app import db
 from sqlalchemy.ext.hybrid import hybrid_property
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 class Videographer(db.Model): 
     __tablename__ = 'videographer'
