@@ -18,7 +18,6 @@ def create_app(test_config=None):
     CORS(app)
 
 
-
     @app.route('/videographers', methods=['POST'])
     @requires_auth('post:videographer')
     def setup_videographer(jwt):
