@@ -100,9 +100,10 @@ def delete_videographer(jwt, id):
     return jsonify({
         'success': True,
         'deleted': {
-            "id": videographer.id
+            "id": videographer.id,
             "firstName": videographer.first_name,
             "lastName": videographer.last_name
+            }
     })
 
 
