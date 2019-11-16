@@ -6,7 +6,9 @@ from flask_cors import CORS
 from sqlalchemy import func
 from auth.auth import AuthError, requires_auth
 
+
 app = Flask(__name__)
+
 
 app.config.from_object(os.environ["APP_SETTINGS"])
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -14,17 +16,17 @@ db = SQLAlchemy(app)
 CORS(app)
 from models import Videographer, Video
 
+
 @app.route('/videographers', methods=['POST'])
 @requires_auth('post:videographer')
 def setup_videographer(jwt):
     videogooForm = request.get_json()
     print(videogooForm)
     videographer = Videographer(first_name=videogooForm['firstName'], last_name=videogooForm['lastName'], location=videogooForm['location'], bio=videogooForm['bio'], profile_url=videogooForm['profilePictureUrl'])
-    videogooCopy = videographer.serialize()
+    videogooCopy = videographer.long()
 
     try:
-        db.session.add(videographer)
-        db.session.commit()
+        videographer.insert()
     except:
         db.session.rollback()
         error = True
@@ -41,19 +43,19 @@ def setup_videographer(jwt):
 @requires_auth('patch:videographer')
 def patch_videographer(jwt):
     videogooForm = request.get_json()
-    print(videogooForm)
-
     videogoo = Videographer.query.get(videogooForm['id'])
+
 
     videogoo.first_name = videogooForm['firstName']
     videogoo.last_name = videogooForm['lastName']
     videogoo.location = videogooForm['location']
     videogoo.bio = videogooForm['bio']
     videogoo.profile_url = videogooForm['profilePictureUrl']
-    videogooCopy = videogoo.serialize()
+    videogooCopy = videogoo.long()
+
 
     try:
-        db.session.commit()
+        videogoo.update()
     except Exception: 
         db.session.rollback()
         abort(422)
@@ -72,52 +74,55 @@ def get_videographers():
     videogoos = Videographer.query.all()
     return jsonify([videogoo.short() for videogoo in videogoos])
 
+
 @app.route('/videographers/<string:name>', methods=['GET'])
 def get_videographer(name):
-    print(name)
     names = name.split('-')
     videogoo = Videographer.query.filter(func.lower(Videographer.first_name).match(names[0])).filter(func.lower(Videographer.last_name).match(names[1])).first()
-    print(videogoo.current_videos)
-    return jsonify(videogoo.serialize())
+    return jsonify(videogoo.long())
 
 
 @app.route('/videographers/<int:id>', methods=['DELETE'])
 @requires_auth('delete:videographer')
 def delete_videographer(jwt, id):
-    videogoo = Videographer.query.get(id)
-    print(videogoo)
+    videographer = Videographer.query.get(id)
+
 
     try:
-        db.session.delete(videogoo)
-        db.session.commit()
+        videographer.delete()
     except Exception:
         db.session.rollback()
         abort(422)
     finally:
         db.session.close()
 
+
     return jsonify({
         'success': True,
-        'delete': videogoo.first_name
+        'deleted': {
+            "id": videographer.id
+            "firstName": videographer.first_name,
+            "lastName": videographer.last_name
     })
+
 
 @app.route('/videos', methods=['POST'])
 @requires_auth('post:video')
 def add_video(jwt):
     videoForm = request.get_json()
-    print(videoForm)
     video = Video(videographer_id=videoForm['videographerId'], title=videoForm['title'], description=videoForm['description'], url=videoForm['url'], )
     videoCopy = video.serialize()
 
+
     try:
-        db.session.add(video)
-        db.session.commit()
+        video.insert()
     except:
         db.session.rollback()
         error = True
         print(sys.exc_info())
     finally:
         db.session.close()
+
 
     return jsonify({
         "video": videoCopy
@@ -127,20 +132,29 @@ def add_video(jwt):
 @requires_auth('delete:video')
 def delete_video(jwt, id):
     video = Video.query.get(id)
-    print(video)
+
 
     try:
-        db.session.delete(video)
-        db.session.commit()
+        video.delete()
     except Exception:
         db.session.rollback()
         abort(422)
     finally:
         db.session.close()
 
+
     return jsonify({
         'success': True,
     })
+
+
+@app.errorhandler(400)
+def bad_request_error(error):
+    return jsonify({
+        'success': False,
+        'error': 400,
+        'message': 'Bad Request'
+    }), 400
 
 
 @app.errorhandler(422)
@@ -161,13 +175,13 @@ def notfound(error):
             }), 404
 
 
-@app.errorhandler(404)
-def notfound(error):
+@app.errorhandler(500)
+def internal_server_error(error):
     return jsonify({
-            "success": False,
-            "error": 404,
-            "message": "resource not found"
-            }), 404
+        'success': False,
+        'error': 500,
+        'message': 'Internal Server Error'
+    }), 500
 
 
 @app.errorhandler(AuthError)
