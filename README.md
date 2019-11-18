@@ -63,82 +63,79 @@ This API will return three error types when requests fail:
     - 422: Unprocessable Entity
     - 500: Internal Server Error
 
+## Resources
+
+### Videographer
+#### with properties
+- id
+- firstName
+- lastName
+- location
+- bio
+- profilePictureUrl
+- videos
+
+### Video
+#### with properties 
+- id
+- videographer_id
+- url
+- title
+- description
+
+
 ## Endpoints
-- GET '/categories'
-- GET '/questions'
-- GET '/categories/<int:category_id>/questions'
-- POST '/questions'
-- POST '/quizzes'
-- POST '/questions/search'
-- DELETE '/questions/<int:id>'
+- GET '/videographers'
+- POST '/videographers'
+- PATCH '/videographers'
+- GET '/videographers/<string:name>'
+- DELETE '/videographers/<int:id>'
+- POST '/videos'
+- DELETE '/videos/<int:id>'
 
-### GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+
+#### GET '/videographers'
+- Fetches all the videographer profiles
 - Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
+- Returns: an array of videographers in short format without videos
 
-GET '/questions'
-- Fetches all the questions
-- Request Arguments: None
-- Request Parameters: page number
-- Returns: an object with properties:
-      questions - with current questions on the page
-      total_questions - number of total questions in the database
-      categories - dictionary of categories in which the keys are the ids and the value is the                    string category name
-      currentCategory - is the currently selected category
-    {
-        'success': boolean
-    }
+#### POST '/videographers'
+- creates a new videographer
+- Body: new videographer
+- Returns: the created videographer
 
 
-GET '/categories/<int:category_id>/questions'
-- Fetches all the questions by a category id
-- Request Arguments: category_id- number
-- Request Parameter: page -number
-- Returns: an object with properties:
-      questions - current questions on the page
-      totalQuestions - number of total questions in this category
-      categories - dictionary of categories in which the keys are the ids and the value is the                    string category name
-      currentCategory - is the currently selected category id
-    {
-        'questions': [questions],
-        'totalQuestions': number,
-        'categories': categoryDictionary,
-        'currentCategory': number
-    }
+#### PATCH '/videographers'
+- Updates an existing videographer
+- Body: updated videographer
+- Returns: videographer in long form
 
-POST '/questions'
-- creates a new question using the submitted question, answer, category and difficulty. Returns success or a 422 error.
-    { 'success': boolean }
+#### GET '/videographers/<string:name>
+- Gets an individual videographer with videos
+- Request Arguments: name of videographer in form first name '-' last name ex 'dan-taylor'
 
-POST '/quizzes'
-- fetches the next quiz question based on the submitted category and previous question ids. 
-- Returns: a question object with the following properties: id, question, answer, category and difficulty. 
-    { 'question': question }
+#### DELETE '/videographers/<int:id>'
+- Deletes an individual videographer using their id
+- Request Arguments: videographer's id
+- Returns: object with the following properties: 
+        {
+            'success': True,
+            'deleted': {
+                "id": videographer.id,
+                "firstName": videographer.first_name,
+                "lastName": videographer.last_name
+            }
+        }
 
-POST '/questions/search'
-- fetches the questions based on the submitted searchTerm 
-- Returns: an array of questions and the total number of questions that match the search term
-    {
-      'questions': [questions],
-      'total_questions': number
-    }
+#### POST '/videos'
+- Adds a video to a videographer's portfolio
+- Body: video
+- Returns video
 
-DELETE '/questions/<int:id>'
-- removes a question from the quiz
-- Request Arguments: question id
-- Returns: a success object with the id of the deleted question:
-    {
-        'success': True,
-        'deleted': number
-    }
-    or a 404 error if deleting fails.
+#### DELETE '/videos/<int:id>'
+- Deletes a video from a videographer's portfolio
+- Request Arguments: video's id
+- Returns: { 'success': True} or errors 404, 422
 
 
 ## Testing
