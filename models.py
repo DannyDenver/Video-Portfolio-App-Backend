@@ -1,4 +1,3 @@
-# from app import db
 import os
 
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -25,7 +24,7 @@ class Videographer(db.Model):
     location = db.Column(db.String(30))
     bio = db.Column(db.String())
     profile_url = db.Column(db.String())
-    videos = db.relationship("Video", backref=db.backref("videographer"), lazy="dynamic")
+    videos = db.relationship("Video", backref=db.backref("videographer"), lazy="dynamic", cascade="delete")
 
 
     @hybrid_property
@@ -119,4 +118,3 @@ class Video(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
-

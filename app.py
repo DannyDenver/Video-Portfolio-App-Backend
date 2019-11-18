@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy 
 from flask_cors import CORS
 from sqlalchemy import func
@@ -8,22 +8,12 @@ from auth.auth import AuthError, requires_auth
 from models import setup_db
 from models import db
 
-#app = Flask(__name__)
 
-#app.config.from_object(os.environ["APP_SETTINGS"])
-#app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-#db = SQLAlchemy(app)
 def create_app(test_config=None):
-    # create and configure the app
     app = Flask(__name__)
     setup_db(app)
     CORS(app)
-    #return app
 
-# setup_db(app)
-# CORS(app)
-
-# app = create_app()
 
     from models import Videographer, Video
 
@@ -55,7 +45,6 @@ def create_app(test_config=None):
         videogooForm = request.get_json()
         videogoo = Videographer.query.get(videogooForm['id'])
 
-
         videogoo.first_name = videogooForm['firstName']
         videogoo.last_name = videogooForm['lastName']
         videogoo.location = videogooForm['location']
@@ -75,7 +64,7 @@ def create_app(test_config=None):
 
 
         return jsonify({
-            "videographer": [videogooCopy]
+            "videographer": videogooCopy
         })
 
 
@@ -89,6 +78,12 @@ def create_app(test_config=None):
     def get_videographer(name):
         names = name.split('-')
         videogoo = Videographer.query.filter(func.lower(Videographer.first_name).match(names[0])).filter(func.lower(Videographer.last_name).match(names[1])).first()
+
+
+        if videogoo is None:
+            abort(404)
+        
+
         return jsonify(videogoo.long())
 
 
@@ -96,6 +91,10 @@ def create_app(test_config=None):
     @requires_auth('delete:videographer')
     def delete_videographer(jwt, id):
         videographer = Videographer.query.get(id)
+
+
+        if videographer is None:
+            abort(404)
 
 
         try:
@@ -113,9 +112,8 @@ def create_app(test_config=None):
                 "id": videographer.id,
                 "firstName": videographer.first_name,
                 "lastName": videographer.last_name
-        }
+            }
         })
-
 
 
     @app.route('/videos', methods=['POST'])
@@ -144,6 +142,10 @@ def create_app(test_config=None):
     @requires_auth('delete:video')
     def delete_video(jwt, id):
         video = Video.query.get(id)
+        
+        
+        if video is None:
+            abort(404)
 
 
         try:
@@ -201,5 +203,6 @@ def create_app(test_config=None):
         response = jsonify(ex.error)
         response.status_code = ex.status_code
         return response
+
 
     return app
