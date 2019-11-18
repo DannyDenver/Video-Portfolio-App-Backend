@@ -47,6 +47,13 @@ python manage.py runserver
 - can delete videos
 
 
+## Signing up 
+
+- New users will be set up with the videographer role
+- Link: https://dannydenver.auth0.com/login?state=g6Fo2SBCeHFneGlxVWltTC0wLUp6QVVvNG43WXRHT21CTjJTT6N0aWTZIG85WnhVLWU2WjJfRWI5M1dqTXMzZjdwa3lUSVE1eEVzo2NpZNkgUXozQ0w4OHRHcFpZSlFGcVhRTmpkemdYVzBRQ210Y3A&client=Qz3CL88tGpZYJQFqXQNjdzgXW0QCmtcp&protocol=oauth2&audience=videoportfolio&response_type=token&redirect_uri=https%3A%2F%2Fvideo-portfolio.herokuapp.com
+
+
+
 ## Error Handling
 
 Errors are returned as JSON objects in the following format: 
