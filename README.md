@@ -2,6 +2,8 @@
 
 ## This app is used for aspiring videographers to set up a profile and link their youtube videos to create a shareable portfolio.
 
+## Live Site: https://video-portfolio.herokuapp.com/
+
 ## Getting Started
 
 ### Installing Dependencies
