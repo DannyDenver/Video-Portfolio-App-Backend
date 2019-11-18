@@ -1,5 +1,7 @@
 # Videographer Portfolio Backend
 
+## This app is used for aspiring videographers to set up a profile and link their youtube videos to create a shareable portfolio.
+
 ## Getting Started
 
 ### Installing Dependencies
