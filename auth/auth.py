@@ -6,10 +6,10 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 import sys
-from settings import AUTH0_DOMAIN, API_AUDIENCE
+from settings import AUTH0_DOMAIN, API_AUDIENCE, ALGORITHMS
 
 
-ALGORITHMS = ['RS256']
+ALGORITHMS = ALGORITHMS
 AUTH0_DOMAIN = AUTH0_DOMAIN
 API_AUDIENCE = API_AUDIENCE
 
