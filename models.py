@@ -2,9 +2,13 @@ import os
 
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_sqlalchemy import SQLAlchemy
+from settings import DATABASE_URL
+
+
+database_path = DATABASE_URL
+
 
 db = SQLAlchemy()
-database_path = os.environ["DATABASE_URL"]
 
 
 def setup_db(app, database_path=database_path):
