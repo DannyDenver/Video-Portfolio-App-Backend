@@ -1,8 +1,20 @@
 # from app import db
+import os
+
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+database_path = os.environ["DATABASE_URL"]
+
+
+def setup_db(app, database_path=database_path):
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_path
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db.app = app
+    db.init_app(app)
+    db.create_all()
+
 
 class Videographer(db.Model): 
     __tablename__ = 'videographer'
