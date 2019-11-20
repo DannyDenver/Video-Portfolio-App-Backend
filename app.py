@@ -21,6 +21,7 @@ def create_app(test_config=None):
     def setup_videographer(jwt):
         videogooForm = request.get_json()
         videographer = Videographer(
+            created_by=jwt['sub'],
             first_name=videogooForm['firstName'],
             last_name=videogooForm['lastName'],
             location=videogooForm['location'],

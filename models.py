@@ -23,8 +23,9 @@ class Videographer(db.Model):
     __tablename__ = 'videographer'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(30))
-    last_name = db.Column(db.String(30))
+    created_by = db.Column(db.String(), nullable=False)
+    first_name = db.Column(db.String(30), nullable=False)
+    last_name = db.Column(db.String(30), nullable=False)
     location = db.Column(db.String(30))
     bio = db.Column(db.String())
     profile_url = db.Column(db.String())
@@ -38,7 +39,8 @@ class Videographer(db.Model):
     def current_videos(self):
         return self.videos.all()
 
-    def __init__(self, first_name, last_name, location, bio, profile_url):
+    def __init__(self, created_by, first_name, last_name, location, bio, profile_url):
+        self.created_by = created_by
         self.first_name = first_name
         self.last_name = last_name
         self.location = location
@@ -55,6 +57,7 @@ class Videographer(db.Model):
     def short(self):
         return {
             'id': self.id,
+            'createdBy': self.created_by,
             'firstName': self.first_name,
             'lastName': self.last_name,
             'location': self.location,
@@ -64,6 +67,7 @@ class Videographer(db.Model):
     def long(self):
         return {
             'id': self.id,
+            'createdBy': self.created_by,
             'firstName': self.first_name,
             'lastName': self.last_name,
             'location': self.location,
