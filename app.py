@@ -77,9 +77,9 @@ def create_app(test_config=None):
     def get_videographer(name):
         names = name.split('-')
         videogoo = Videographer.query.filter(
-                func.lower(Videographer.first_name).match(names[0])
-                ).filter(
-                func.lower(Videographer.last_name).match(names[1])
+            Videographer.first_name == names[0].capitalize()
+            ).filter(
+                Videographer.last_name == names[1].capitalize()
                 ).first()
 
         if videogoo is None:
